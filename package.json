@@ -12,6 +12,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"express": "^4.16.4",
-		"get-port": "^4.1.0"
+		"get-port": "^4.1.0",
+		"node-fetch": "^2.3.0"
 	}
 }
