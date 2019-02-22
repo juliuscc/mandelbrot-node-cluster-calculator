@@ -9,5 +9,9 @@
 	},
 	"keywords": [],
 	"author": "",
-	"license": "ISC"
+	"license": "ISC",
+	"dependencies": {
+		"express": "^4.16.4",
+		"get-port": "^4.1.0"
+	}
 }
