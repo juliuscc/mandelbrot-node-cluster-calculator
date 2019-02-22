@@ -22,10 +22,21 @@ max_n = parseInt(max_n)
 width = parseInt(width)
 height = parseInt(height)
 
+const min_x = c_coordinate_to_pixel_coordinate(min_c_re, width)
+const max_x = c_coordinate_to_pixel_coordinate(max_c_re, width)
+const min_y = c_coordinate_to_pixel_coordinate(min_c_im, height)
+const max_y = c_coordinate_to_pixel_coordinate(max_c_im, height)
+
+// console.log({ min_x, max_x, min_y, max_y, width, height })
+
 const matrix = new Array(height).fill(0).map(() => new Array(width).fill(0))
 
 function pixel_coordinate_to_c_coordinate(pixel, dimension) {
 	return (pixel / dimension - 0.5) * 4
+}
+
+function c_coordinate_to_pixel_coordinate(c_coordinate, dimension) {
+	return ((c_coordinate + 2) / 4) * dimension
 }
 
 function calculatePixel(pixel_x, pixel_y) {
@@ -45,8 +56,8 @@ function calculatePixel(pixel_x, pixel_y) {
 	return iterations
 }
 
-for (var pixel_x = 0; pixel_x < width; pixel_x++) {
-	for (var pixel_y = 0; pixel_y < height; pixel_y++) {
+for (var pixel_x = min_x; pixel_x < max_x; pixel_x++) {
+	for (var pixel_y = min_y; pixel_y < max_y; pixel_y++) {
 		matrix[pixel_y][pixel_x] = calculatePixel(pixel_x, pixel_y) % 255
 	}
 }
