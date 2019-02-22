@@ -15,9 +15,7 @@ const fs = require('fs')
 
 const [width, height] = [1000, 1000]
 
-const matrix = new Array(height)
-	.fill(0)
-	.map(() => new Array(width).fill([0, 0, 0]))
+const matrix = new Array(height).fill(0).map(() => new Array(width).fill(0))
 
 function calculatePixel(x, y) {
 	var i = 0
@@ -39,13 +37,13 @@ function calculatePixel(x, y) {
 for (var x = 0; x < width; x++) {
 	for (var y = 0; y < height; y++) {
 		const i = calculatePixel(x, y)
-		matrix[y][x] = [i, i, i]
+		matrix[y][x] = i
 	}
 }
 
 const data = matrix.flat().flat()
 const ppmHeader = Buffer.from(
-	`P6\n ${width} ${height}\n255\n`,
+	`P5\n ${width} ${height}\n255\n`,
 	'ascii'
 ).toJSON().data
 
