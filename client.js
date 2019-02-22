@@ -22,21 +22,12 @@ max_n = parseInt(max_n)
 width = parseInt(width)
 height = parseInt(height)
 
-const min_x = c_coordinate_to_pixel_coordinate(min_c_re, width)
-const max_x = c_coordinate_to_pixel_coordinate(max_c_re, width)
-const min_y = c_coordinate_to_pixel_coordinate(min_c_im, height)
-const max_y = c_coordinate_to_pixel_coordinate(max_c_im, height)
-
 const matrix = new Array(height).fill(0).map(() => new Array(width).fill(0))
 
 function pixel_coordinate_to_c_coordinate(pixel, dimension, c_min, c_max) {
 	const normalized_on_img = pixel / dimension
 	const complex_range = Math.abs(c_min - c_max)
 	return normalized_on_img * complex_range + c_min
-}
-
-function c_coordinate_to_pixel_coordinate(c_coordinate, dimension) {
-	return ((c_coordinate + 2) / 4) * dimension
 }
 
 function calculatePixel(pixel_x, pixel_y) {
@@ -74,6 +65,7 @@ for (var pixel_x = 0; pixel_x < width; pixel_x++) {
 }
 
 const data = matrix.flat().flat()
+
 const ppmHeader = Buffer.from(
 	`P5\n ${width} ${height}\n255\n`,
 	'ascii'
