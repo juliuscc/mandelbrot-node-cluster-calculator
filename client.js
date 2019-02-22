@@ -17,10 +17,10 @@ const [width, height] = [1000, 1000]
 
 const matrix = new Array(height).fill(0).map(() => new Array(width).fill(0))
 
-function calculatePixel(x, y) {
-	var i = 0
-	var cx = -2 + x / (width / 4)
-	var cy = -2 + y / (height / 4)
+function calculatePixel(pixel_x, pixel_y) {
+	var iterations = 0
+	var cx = -2 + pixel_x / (width / 4)
+	var cy = -2 + pixel_y / (height / 4)
 	var zx = 0
 	var zy = 0
 
@@ -28,16 +28,15 @@ function calculatePixel(x, y) {
 		var xt = zx * zy
 		zx = zx * zx - zy * zy + cx
 		zy = 2 * xt + cy
-		i++
-	} while (i < 255 && zx * zx + zy * zy < 4)
+		iterations++
+	} while (iterations < 2048 && zx * zx + zy * zy < 4)
 
-	return i
+	return iterations
 }
 
-for (var x = 0; x < width; x++) {
-	for (var y = 0; y < height; y++) {
-		const i = calculatePixel(x, y)
-		matrix[y][x] = i
+for (var pixel_x = 0; pixel_x < width; pixel_x++) {
+	for (var pixel_y = 0; pixel_y < height; pixel_y++) {
+		matrix[pixel_y][pixel_x] = calculatePixel(pixel_x, pixel_y) % 255
 	}
 }
 
@@ -49,4 +48,4 @@ const ppmHeader = Buffer.from(
 
 const ppmBuffer = Buffer.from(ppmHeader.concat(data))
 
-fs.writeFileSync('./png.ppm', ppmBuffer, 'ascii')
+fs.writeFileSync('./mangelbrot.ppm', ppmBuffer, 'ascii')
