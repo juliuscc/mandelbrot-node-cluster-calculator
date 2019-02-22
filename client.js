@@ -1,6 +1,7 @@
 const fs = require('fs')
-const fetch = require('node-fetch')
+const http = require('http')
 const mandelbrot = require('./mandelbrot')
+
 let [
 	IGNORE_NODE,
 	IGNORE_FILE_NAME,
@@ -25,54 +26,78 @@ width = parseInt(width)
 height = parseInt(height)
 divisions = parseInt(divisions)
 
-const c_re_slice = Math.abs(max_c_re - min_c_re) / divisions
-const width_slice = width / divisions
-
-async function getSlice(
-	address,
-	min_c_re,
-	min_c_im,
-	max_c_re,
-	max_c_im,
-	x,
-	y,
-	inf_n
-) {
-	return await fetch(
-		`${address}/${min_c_re}/${min_c_im}/${max_c_re}/${max_c_im}/${x}/${y}/${inf_n}`
-	).then(res => res.json())
-}
+const c_im_slice = Math.abs(max_c_im - min_c_im) / divisions
+const height_slice = height / divisions
 
 const serverAddresses = new Array(divisions - 1)
 	.fill(0)
 	.map((v, index) => list_of_servers[index])
 
-const results = serverAddresses.map((address, index) =>
-	fetch(
-		`${address}/${min_c_re + c_re_slice * index}/${min_c_im}/${min_c_re +
-			c_re_slice *
-				(index + 1)}/${max_c_im}/${width_slice}/${height}/${max_n}`
-	).then(result => result.json())
-)
-
-const local_result = mandelbrot(
-	min_c_re + c_re_slice * (divisions - 1),
+function getSlice(
+	address,
+	index,
+	min_c_re,
 	min_c_im,
 	max_c_re,
 	max_c_im,
 	max_n,
-	width_slice,
+	width,
 	height
+) {
+	return new Promise(resolve => {
+		http.get(
+			`http://${address}/${min_c_re}/${min_c_im +
+				c_im_slice * index}/${max_c_re}/${min_c_im +
+				c_im_slice * (index + 1)}/${width}/${height_slice}/${max_n}`,
+			res => {
+				let rawData = ''
+				res.on('data', chunk => {
+					rawData += chunk
+				})
+				res.on('end', () => {
+					const parsedData = JSON.parse(rawData)
+					resolve(parsedData)
+				})
+			}
+		)
+	})
+}
+
+const results = serverAddresses.map((address, index) =>
+	getSlice(
+		address,
+		index,
+		min_c_re,
+		min_c_im,
+		max_c_re,
+		max_c_im,
+		max_n,
+		width,
+		height
+	)
 )
 
-const remote_results = await Promise.all(results)
-const final_result = remote_results.concat(local_result).flat()
+const local_result = mandelbrot(
+	min_c_re,
+	min_c_im + c_im_slice * (divisions - 1),
+	max_c_re,
+	max_c_im,
+	max_n,
+	width,
+	height_slice
+)
 
-const ppmHeader = Buffer.from(
-	`P5\n ${width} ${height}\n255\n`,
-	'ascii'
-).toJSON().data
+;(async function() {
+	const remote_results = await Promise.all(results)
 
-const ppmBuffer = Buffer.from(ppmHeader.concat(final_result))
+	const final_result = remote_results.concat(local_result).flat()
 
-fs.writeFileSync('./mangelbrot.ppm', ppmBuffer, 'ascii')
+	const ppmHeader = Buffer.from(
+		`P5\n ${width} ${height}\n255\n`,
+		'ascii'
+	).toJSON().data
+
+	const ppmBuffer = Buffer.from(ppmHeader.concat(final_result))
+
+	fs.writeFileSync('./mangelbrot.ppm', ppmBuffer, 'ascii')
+})()

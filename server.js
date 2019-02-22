@@ -10,6 +10,9 @@ const app = express()
 	app.get(
 		'/:min_c_re/:min_c_im/:max_c_re/:max_c_im/:x/:y/:inf_n',
 		(req, res) => {
+			console.log('Got request:')
+			console.log(req.params)
+
 			let {
 				min_c_re,
 				min_c_im,
@@ -40,6 +43,7 @@ const app = express()
 
 			res.setHeader('Content-Type', 'application/json')
 			res.send(JSON.stringify(data))
+			console.log('Returned request')
 		}
 	)
 
