@@ -27,12 +27,12 @@ const max_x = c_coordinate_to_pixel_coordinate(max_c_re, width)
 const min_y = c_coordinate_to_pixel_coordinate(min_c_im, height)
 const max_y = c_coordinate_to_pixel_coordinate(max_c_im, height)
 
-// console.log({ min_x, max_x, min_y, max_y, width, height })
-
 const matrix = new Array(height).fill(0).map(() => new Array(width).fill(0))
 
-function pixel_coordinate_to_c_coordinate(pixel, dimension) {
-	return (pixel / dimension - 0.5) * 4
+function pixel_coordinate_to_c_coordinate(pixel, dimension, c_min, c_max) {
+	const normalized_on_img = pixel / dimension
+	const complex_range = Math.abs(c_min - c_max)
+	return normalized_on_img * complex_range + c_min
 }
 
 function c_coordinate_to_pixel_coordinate(c_coordinate, dimension) {
@@ -41,8 +41,19 @@ function c_coordinate_to_pixel_coordinate(c_coordinate, dimension) {
 
 function calculatePixel(pixel_x, pixel_y) {
 	var iterations = 0
-	var cx = pixel_coordinate_to_c_coordinate(pixel_x, width)
-	var cy = pixel_coordinate_to_c_coordinate(pixel_y, height)
+	var cx = pixel_coordinate_to_c_coordinate(
+		pixel_x,
+		width,
+		min_c_re,
+		max_c_re
+	)
+	var cy = pixel_coordinate_to_c_coordinate(
+		pixel_y,
+		height,
+		min_c_im,
+		max_c_im
+	)
+
 	var zx = 0
 	var zy = 0
 
@@ -56,8 +67,8 @@ function calculatePixel(pixel_x, pixel_y) {
 	return iterations
 }
 
-for (var pixel_x = min_x; pixel_x < max_x; pixel_x++) {
-	for (var pixel_y = min_y; pixel_y < max_y; pixel_y++) {
+for (var pixel_x = 0; pixel_x < width; pixel_x++) {
+	for (var pixel_y = 0; pixel_y < height; pixel_y++) {
 		matrix[pixel_y][pixel_x] = calculatePixel(pixel_x, pixel_y) % 255
 	}
 }
