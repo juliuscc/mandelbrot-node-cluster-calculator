@@ -13,12 +13,16 @@
 // ] = process.argv
 const fs = require('fs')
 
-const matrix = new Array(200).fill(0).map(() => new Array(200).fill([0, 0, 0]))
+const [width, height] = [1000, 1000]
+
+const matrix = new Array(height)
+	.fill(0)
+	.map(() => new Array(width).fill([0, 0, 0]))
 
 function calculatePixel(x, y) {
 	var i = 0
-	var cx = -2 + x / 50
-	var cy = -2 + y / 50
+	var cx = -2 + x / (width / 4)
+	var cy = -2 + y / (height / 4)
 	var zx = 0
 	var zy = 0
 
@@ -32,15 +36,18 @@ function calculatePixel(x, y) {
 	return i
 }
 
-for (var x = 0; x < 200; x++) {
-	for (var y = 0; y < 200; y++) {
+for (var x = 0; x < width; x++) {
+	for (var y = 0; y < height; y++) {
 		const i = calculatePixel(x, y)
 		matrix[y][x] = [i, i, i]
 	}
 }
 
 const data = matrix.flat().flat()
-const ppmHeader = Buffer.from('P6\n 200 200\n255\n', 'ascii').toJSON().data
+const ppmHeader = Buffer.from(
+	`P6\n ${width} ${height}\n255\n`,
+	'ascii'
+).toJSON().data
 
 const ppmBuffer = Buffer.from(ppmHeader.concat(data))
 
