@@ -47,5 +47,3 @@ const app = express()
 		console.log(`Mandelbrot server listening on port ${port}!`)
 	)
 })()
-
-// setInterval(() => {}, 10000000)
