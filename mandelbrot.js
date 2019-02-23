@@ -1,3 +1,9 @@
+/**
+ * Heavily inspired from
+ * http://slicker.me/fractals/fractals.htm
+ *
+ */
+
 function mandelbrot(
 	min_c_re,
 	min_c_im,
@@ -16,35 +22,34 @@ function mandelbrot(
 	}
 
 	function calculatePixel(pixel_x, pixel_y) {
-		var iterations = 0
-		var cx = pixel_coordinate_to_c_coordinate(
+		const cx = pixel_coordinate_to_c_coordinate(
 			pixel_x,
 			width,
 			min_c_re,
 			max_c_re
 		)
-		var cy = pixel_coordinate_to_c_coordinate(
+		const cy = pixel_coordinate_to_c_coordinate(
 			pixel_y,
 			height,
 			min_c_im,
 			max_c_im
 		)
 
-		var zx = 0
-		var zy = 0
+		let iterations = 0
+		let zx = 0
+		let zy = 0
 
 		do {
-			var xt = zx * zy
+			let xt = zx * zy
 			zx = zx * zx - zy * zy + cx
 			zy = 2 * xt + cy
-			iterations++
-		} while (iterations < max_n && zx * zx + zy * zy < 4)
+		} while (++iterations < max_n && zx * zx + zy * zy < 4)
 
 		return iterations
 	}
 
-	for (var pixel_x = 0; pixel_x < width; pixel_x++) {
-		for (var pixel_y = 0; pixel_y < height; pixel_y++) {
+	for (let pixel_x = 0; pixel_x < width; pixel_x++) {
+		for (let pixel_y = 0; pixel_y < height; pixel_y++) {
 			matrix[pixel_y][pixel_x] = calculatePixel(pixel_x, pixel_y) % 255
 		}
 	}
